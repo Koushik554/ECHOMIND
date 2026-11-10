@@ -1,0 +1,22 @@
+{
+  "name": "echomind",
+  "version": "1.0.0",
+  "description": "EchoMind — AI-powered project memory and context recovery engine for solo developers, students, and freelancers",
+  "private": true,
+  "scripts": {
+    "start": "node server/src/server.js",
+    "build": "cd client && npm run build",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev"
+  },
+  "keywords": [
+    "ai",
+    "context-recovery",
+    "productivity",
+    "bharatcode",
+    "qwen",
+    "hackathon"
+  ],
+  "author": "Beekam Sri Koushik Sai Naga Singh",
+  "license": "MIT"
+}

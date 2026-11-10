@@ -8,3 +8,4 @@ Model / API Usage: Integrates BharatCode Model API for structured project memory
 Developer: Beekam Sri Koushik Sai Naga Singh
 Email: beekamkoushik@gmail.com
 Verification Notice: All API keys and secrets are securely restricted to server-side environment variables and are excluded from version control.
+
