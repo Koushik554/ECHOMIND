@@ -111,3 +111,4 @@ export function generateProjectMarkdown(project, memoryData) {
 
   return md;
 }
+

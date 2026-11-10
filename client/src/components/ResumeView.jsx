@@ -171,3 +171,4 @@ export default function ResumeView({ project, onSwitchToCapture }) {
     </div>
   );
 }
+

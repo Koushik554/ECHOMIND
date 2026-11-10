@@ -7,3 +7,4 @@ app.listen(PORT, () => {
   console.log(`[EchoMind Backend] Health endpoint: http://localhost:${PORT}/api/health`);
   console.log(`[EchoMind Backend] AI Model configured: ${process.env.BHARATCODE_MODEL || 'qwen-3.8-27b'}`);
 });
+
