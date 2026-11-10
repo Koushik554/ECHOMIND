@@ -4,8 +4,8 @@ Description: AI-powered project memory and context recovery engine. EchoMind tur
 Target Audience: Solo developers, students, freelancers, and knowledge workers juggling multiple projects.
 Core Stack: React, Vite, Tailwind CSS, Node.js, Express, BharatCode Sovereign Model API
 Submission Declaration: This repository is an official submission for the BharatCode Hackathon (BharatCode Build League).
+Repository URL: https://github.com/Koushik554/ECHOMIND
 Model / API Usage: Integrates BharatCode Model API for structured project memory extraction following a strict deterministic JSON schema.
 Developer: Beekam Sri Koushik Sai Naga Singh
 Email: beekamkoushik@gmail.com
 Verification Notice: All API keys and secrets are securely restricted to server-side environment variables and are excluded from version control.
-

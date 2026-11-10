@@ -78,8 +78,8 @@ echomind/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<YOUR_USERNAME>/echomind.git
-cd echomind
+git clone https://github.com/Koushik554/ECHOMIND.git
+cd ECHOMIND
 ```
 
 ### 2. Configure Backend Environment
