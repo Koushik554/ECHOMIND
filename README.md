@@ -37,6 +37,7 @@ Developers, students, and freelancers working across multiple projects constantl
   3. *What should I do next?*
 - **⏳ History & Snapshots:** Save and restore historical snapshots directly in local browser storage.
 - **📋 One-Click Markdown Export:** Export clean, GitHub-flavored markdown summaries to copy or download.
+- **📘 Development Retrospective:** See [DEVELOPMENT_REPORT.md](DEVELOPMENT_REPORT.md) for full implementation details, problems faced, and future roadmap.
 
 ---
 
