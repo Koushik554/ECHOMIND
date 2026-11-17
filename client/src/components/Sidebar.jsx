@@ -190,15 +190,15 @@ export default function Sidebar({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${serverStatus?.ok ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></span>
-            <span className="text-slate-300 font-medium">BharatCode AI</span>
+            <span className="text-slate-300 font-medium">EchoMind AI Engine</span>
           </div>
-          <span className="text-slate-400 text-[10px]">
-            {serverStatus?.model || 'qwen-3.8-27b'}
+          <span className="text-emerald-400 text-[10px] font-semibold bg-emerald-950/80 border border-emerald-800 px-1.5 py-0.5 rounded">
+            Offline Ready
           </span>
         </div>
         <div className="mt-1 text-[10px] text-slate-400 flex items-center justify-between">
           <span>Backend: {serverStatus?.ok ? 'Connected' : 'Offline'}</span>
-          <span className="text-indigo-400">10M Token Free</span>
+          <span className="text-indigo-400">Zero-API Required</span>
         </div>
       </div>
     </aside>

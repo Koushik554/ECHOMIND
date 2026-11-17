@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { analyzeContextOffline } from './offlineAi.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -95,7 +96,6 @@ export function normalizeProjectMemory(data) {
  */
 export function cleanJsonOutput(text) {
   let cleaned = text.trim();
-  // Strip ```json and ```
   if (cleaned.startsWith('```json')) {
     cleaned = cleaned.replace(/^```json\s*/i, '');
   } else if (cleaned.startsWith('```')) {
@@ -109,17 +109,23 @@ export function cleanJsonOutput(text) {
 
 /**
  * Main analyze context function
+ * Automatically falls back to the local offline AI engine when upstream
+ * quota, subscription, or network issues occur.
  */
 export async function analyzeContext({ projectTitle, inputText }) {
+  const forceOffline = process.env.USE_OFFLINE_AI === 'true';
   const apiKey = process.env.BHARATCODE_API_KEY;
   const baseUrl = (process.env.BHARATCODE_BASE_URL || 'https://bharatcode.ai/api/model/v1').replace(/\/$/, '');
-  const model = process.env.BHARATCODE_MODEL || 'qwen-3.8-27b';
+  const model = process.env.BHARATCODE_MODEL || 'glm-5.3-flash';
 
-  if (!apiKey || apiKey === 'your_bharatcode_api_key_here') {
-    const error = new Error('BharatCode API key is missing. Please configure BHARATCODE_API_KEY in server/.env');
-    error.status = 500;
-    error.code = 'MISSING_API_KEY';
-    throw error;
+  // If forced offline or no API key, use Offline AI Engine immediately
+  if (forceOffline || !apiKey || apiKey === 'your_bharatcode_api_key_here') {
+    console.log('[EchoMind Engine] Using local Offline AI Engine');
+    const offlineResult = analyzeContextOffline({ projectTitle, inputText });
+    return {
+      ...normalizeProjectMemory(offlineResult),
+      _engine: 'EchoMind Offline AI Engine'
+    };
   }
 
   const userContent = `Project Title: ${projectTitle || 'Untitled Project'}
@@ -132,7 +138,7 @@ ${inputText}
 Analyze this input and extract structured project memory according to the required JSON schema. Output pure JSON only.`;
 
   const controller = new AbortController();
-  const timeoutMs = 35000;
+  const timeoutMs = 25000;
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
@@ -156,30 +162,27 @@ Analyze this input and extract structured project memory according to the requir
 
     clearTimeout(timeoutId);
 
+    // If upstream requires subscription (402) or is rate limited (429) or fails, fallback to Offline AI
     if (!response.ok) {
       const errorBody = await response.text();
-      let errorJson = null;
-      try {
-        errorJson = JSON.parse(errorBody);
-      } catch {
-        // Not JSON
-      }
-
-      const message = errorJson?.error?.message || errorJson?.message || `BharatCode upstream API returned HTTP ${response.status}`;
-      const err = new Error(message);
-      err.status = response.status;
-      err.code = 'UPSTREAM_API_ERROR';
-      throw err;
+      console.warn(`[EchoMind Engine] BharatCode upstream returned HTTP ${response.status}. Engaging local Offline AI Engine fallback.`);
+      const offlineResult = analyzeContextOffline({ projectTitle, inputText });
+      return {
+        ...normalizeProjectMemory(offlineResult),
+        _engine: `EchoMind Offline AI (Fallback from HTTP ${response.status})`
+      };
     }
 
     const data = await response.json();
     const rawContent = data?.choices?.[0]?.message?.content;
 
     if (!rawContent) {
-      const err = new Error('BharatCode model returned an empty response.');
-      err.status = 502;
-      err.code = 'EMPTY_MODEL_RESPONSE';
-      throw err;
+      console.warn('[EchoMind Engine] Model returned empty content. Falling back to local engine.');
+      const offlineResult = analyzeContextOffline({ projectTitle, inputText });
+      return {
+        ...normalizeProjectMemory(offlineResult),
+        _engine: 'EchoMind Offline AI (Fallback)'
+      };
     }
 
     const cleanedText = cleanJsonOutput(rawContent);
@@ -187,31 +190,31 @@ Analyze this input and extract structured project memory according to the requir
     let parsed;
     try {
       parsed = JSON.parse(cleanedText);
-    } catch (parseError) {
-      // Sometimes models produce text before JSON; attempt to find outermost { and }
+    } catch {
       const firstBrace = cleanedText.indexOf('{');
       const lastBrace = cleanedText.lastIndexOf('}');
       if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
         parsed = JSON.parse(cleanedText.substring(firstBrace, lastBrace + 1));
       } else {
-        const err = new Error('Failed to parse structured JSON from BharatCode response.');
-        err.status = 502;
-        err.code = 'MALFORMED_OUTPUT';
-        err.rawOutput = rawContent;
-        throw err;
+        const offlineResult = analyzeContextOffline({ projectTitle, inputText });
+        return {
+          ...normalizeProjectMemory(offlineResult),
+          _engine: 'EchoMind Offline AI (Fallback)'
+        };
       }
     }
 
-    return normalizeProjectMemory(parsed);
+    return {
+      ...normalizeProjectMemory(parsed),
+      _engine: `BharatCode Cloud AI (${model})`
+    };
   } catch (error) {
     clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      const timeoutError = new Error('Request to BharatCode API timed out after 35 seconds.');
-      timeoutError.status = 504;
-      timeoutError.code = 'API_TIMEOUT';
-      throw timeoutError;
-    }
-    throw error;
+    console.warn(`[EchoMind Engine] Upstream request failed: ${error.message}. Engaging local Offline AI Engine.`);
+    const offlineResult = analyzeContextOffline({ projectTitle, inputText });
+    return {
+      ...normalizeProjectMemory(offlineResult),
+      _engine: 'EchoMind Offline AI (Local Mode)'
+    };
   }
 }
-

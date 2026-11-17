@@ -71,3 +71,4 @@
 - [ ] **IDE Extension (VS Code / JetBrains):** Embed EchoMind directly into the IDE sidebar so developers can recover context without leaving their code editor.
 - [ ] **Third-Party Sync:** Export tasks and blockers directly to Linear, Jira, GitHub Issues, or Notion pages.
 - [ ] **Team Collaboration Workspaces:** Allow small dev teams to share project memory snapshots and keep standup logs in sync.
+
