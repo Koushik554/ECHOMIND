@@ -76,3 +76,4 @@ test('GET /api/nonexistent returns structured 404 error without leaking internal
   assert.equal(data.error.code, 'NOT_FOUND');
   assert.ok(data.error.message.includes('/api/nonexistent-route-for-testing'));
 });
+

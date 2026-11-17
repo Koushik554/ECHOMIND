@@ -1,8 +1,27 @@
-/**
- * BharatCode API Service
- * Handles communication with the BharatCode OpenAI-compatible API
- * for structured project memory and context recovery.
- */
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure .env is always loaded
+const possibleEnvPaths = [
+  path.resolve(__dirname, '../.env'),
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), 'server/.env')
+];
+
+for (const envPath of possibleEnvPaths) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    if (process.env.BHARATCODE_API_KEY && process.env.BHARATCODE_API_KEY !== 'your_bharatcode_api_key_here') {
+      break;
+    }
+  }
+}
 
 const SYSTEM_PROMPT = `You are EchoMind's project analyst engine. Your job is to extract structured project memory from raw notes, work logs, bug dumps, or task updates.
 

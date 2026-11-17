@@ -66,3 +66,4 @@ test('normalizeProjectMemory guarantees complete schema conforming to hackathon 
   assert.equal(normalizedFull.decisions[0].decision, 'Used Postgres');
   assert.equal(normalizedFull.next_actions[0].priority, 'high');
 });
+

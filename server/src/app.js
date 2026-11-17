@@ -8,10 +8,20 @@ import healthRoutes from './routes/health.routes.js';
 import analyzeRoutes from './routes/analyze.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Explicitly resolve and load .env regardless of which directory the command is run from
+const serverEnvPath = path.resolve(__dirname, '../.env');
+const rootEnvPath = path.resolve(__dirname, '../../.env');
+
+if (fs.existsSync(serverEnvPath)) {
+  dotenv.config({ path: serverEnvPath });
+} else if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+} else {
+  dotenv.config();
+}
 
 const app = express();
 
