@@ -30,26 +30,23 @@ app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use('/api', healthRoutes);
 app.use('/api', analyzeRoutes);
 
+// Catch-all 404 handler for unknown API endpoints
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    error: {
+      code: 'NOT_FOUND',
+      message: `Cannot ${req.method} ${req.originalUrl}`,
+      timestamp: new Date().toISOString()
+    }
+  });
+});
+
 // Static client hosting when built
 const clientDistPath = path.resolve(__dirname, '../../client/dist');
 if (fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
+  app.get('*', (req, res) => {
     res.sendFile(path.join(clientDistPath, 'index.html'));
-  });
-} else {
-  // Catch-all 404 handler for API routes
-  app.use('/api/*', (req, res) => {
-    res.status(404).json({
-      error: {
-        code: 'NOT_FOUND',
-        message: `Cannot ${req.method} ${req.originalUrl}`,
-        timestamp: new Date().toISOString()
-      }
-    });
   });
 }
 

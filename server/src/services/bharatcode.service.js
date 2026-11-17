@@ -41,7 +41,7 @@ JSON Output Schema:
 /**
  * Validate and normalize the structured output to ensure no fields are missing.
  */
-function normalizeProjectMemory(data) {
+export function normalizeProjectMemory(data) {
   const validStatuses = ['not_started', 'in_progress', 'blocked', 'completed'];
   const status = validStatuses.includes(data?.status) ? data.status : 'in_progress';
 
@@ -74,7 +74,7 @@ function normalizeProjectMemory(data) {
 /**
  * Clean model output string by stripping markdown fences if present
  */
-function cleanJsonOutput(text) {
+export function cleanJsonOutput(text) {
   let cleaned = text.trim();
   // Strip ```json and ```
   if (cleaned.startsWith('```json')) {
